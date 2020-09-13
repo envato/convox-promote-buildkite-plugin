@@ -1,0 +1,33 @@
+name: Convox Promote
+description: Promote (and optionally verify) a Convox release
+author: https://github.com/liamdawson
+requirements:
+  - convox
+  - awk
+configuration:
+  required:
+    - rack
+    - app
+    - release
+  additionalProperties: false
+  properties:
+    rack:
+      type: string
+    app:
+      type: string
+    release:
+      oneOf:
+        - type: string
+        - type: object
+          additionalProperties: false
+          properties:
+            metadata-key:
+              type: string
+    wait:
+      type: [boolean, string]
+      default: verify
+      oneOf:
+        - type: string
+          enum:
+            - verify
+        - type: boolean

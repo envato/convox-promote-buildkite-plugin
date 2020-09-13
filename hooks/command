@@ -1,0 +1,38 @@
+#!/bin/bash
+set -euo pipefail
+
+convox_rack="$BUILDKITE_PLUGIN_CONVOX_PROMOTE_RACK"
+convox_app="$BUILDKITE_PLUGIN_CONVOX_PROMOTE_APP"
+wait_option="${BUILDKITE_PLUGIN_CONVOX_PROMOTE_WAIT:-verify}"
+
+if [ "${BUILDKITE_PLUGIN_CONVOX_PROMOTE_RELEASE_METADATA_KEY:-}" != "" ]; then
+  convox_release="$(buildkite-agent meta-data get "$BUILDKITE_PLUGIN_CONVOX_PROMOTE_RELEASE_METADATA_KEY")"
+else
+  convox_release="$BUILDKITE_PLUGIN_CONVOX_PROMOTE_RELEASE"
+fi
+
+convox_promote_cmd=( convox releases promote --rack="$convox_rack" --app="$convox_app" "$convox_release" )
+convox_releases_cmd=( convox releases --rack="$convox_rack" --app="$convox_app" )
+
+if [[ "$wait_option" != "false" ]]; then
+  convox_promote_cmd+=( --wait )
+fi
+
+echo "Release ID: ${convox_release}"
+echo "--- Promoting Convox release"
+
+echo '$'" ${convox_promote_cmd[*]}"
+"${convox_promote_cmd[@]}"
+
+if [ "$wait_option" = "verify" ]; then
+  echo "--- Verifying release"
+
+  echo "${convox_releases_cmd[@]}"
+  active_release="$("${convox_releases_cmd[@]}" | tee /dev/stderr | awk '$2 == "active" {print $1}')"
+
+  echo "Active release:   ${active_release}"
+  if [ "${active_release}" != "${convox_release}" ]; then
+    echo "Expected release: ${convox_release}"
+    exit 7
+  fi
+fi
