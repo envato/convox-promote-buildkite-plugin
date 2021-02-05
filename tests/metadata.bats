@@ -8,7 +8,7 @@ export CONVOX_HOST="convox.invalid"
 # basic configuration
 export BUILDKITE_PLUGIN_CONVOX_PROMOTE_RACK="test-rack"
 export BUILDKITE_PLUGIN_CONVOX_PROMOTE_APP="test-app"
-export BUILDKITE_PLUGIN_CONVOX_PROMOTE_WAIT="false"
+export BUILDKITE_PLUGIN_CONVOX_PROMOTE_VERIFY="false"
 export BUILDKITE_PLUGIN_CONVOX_PROMOTE_RELEASE_METADATA_KEY="convox-release-id"
 
 function setup() {

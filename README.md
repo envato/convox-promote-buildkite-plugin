@@ -4,7 +4,11 @@ A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that promotes 
 
 - Convox release is promoted via the Convox CLI (`convox releases promote`)
 - Release IDs can be retrieved from metadata
-- By default, wait for the promote to finish, then verify that the active release is the newly promoted build
+- Optionally, verify the active release is the newly promoted build
+
+## Requirements
+
+- Convox CLI >= 3.0.42
 
 ## Example
 
@@ -25,7 +29,7 @@ steps:
     - liamdawson/convox-promote#v1.0.0:
         rack: test-rack
         app: test-app
-        wait: false
+        verify: false
         release:
           metadata-key: convox-release-id
 ```

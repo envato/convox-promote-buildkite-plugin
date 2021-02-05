@@ -9,7 +9,7 @@ export CONVOX_HOST="convox.invalid"
 export BUILDKITE_PLUGIN_CONVOX_PROMOTE_RACK="test-rack"
 export BUILDKITE_PLUGIN_CONVOX_PROMOTE_APP="test-app"
 export BUILDKITE_PLUGIN_CONVOX_PROMOTE_RELEASE="TESTRELEASE"
-export BUILDKITE_PLUGIN_CONVOX_PROMOTE_WAIT="false"
+export BUILDKITE_PLUGIN_CONVOX_PROMOTE_VERIFY="false"
 
 _EXPECTED_RELEASE_ID='TESTRELEASE'
 _EXPECTED_PROMOTE_ARGS="releases promote --rack=test-rack --app=test-app ${_EXPECTED_RELEASE_ID}"
@@ -30,15 +30,6 @@ subject() {
   stub_promote "${_EXPECTED_PROMOTE_ARGS}"
 
   subject
-
-  unstub convox
-}
-
-@test "Supports waiting for the build" {
-  stub_promote "${_EXPECTED_PROMOTE_ARGS} --wait"
-
-  BUILDKITE_PLUGIN_CONVOX_PROMOTE_WAIT="true" \
-    subject
 
   unstub convox
 }

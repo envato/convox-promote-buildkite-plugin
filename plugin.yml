@@ -15,6 +15,9 @@ configuration:
       type: string
     app:
       type: string
+    verify:
+      type: boolean
+      default: false # TODO: default to verifying, if it'll work with a deploy key
     release:
       oneOf:
         - type: string
@@ -23,11 +26,3 @@ configuration:
           properties:
             metadata-key:
               type: string
-    wait:
-      type: [boolean, string]
-      default: verify
-      oneOf:
-        - type: string
-          enum:
-            - verify
-        - type: boolean
