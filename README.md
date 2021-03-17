@@ -26,7 +26,7 @@ steps:
   - wait:
 
   - plugins:
-    - liamdawson/convox-promote#v1.0.0:
+    - liamdawson/convox-promote#v1.1.0:
         rack: test-rack
         app: test-app
         verify: false
