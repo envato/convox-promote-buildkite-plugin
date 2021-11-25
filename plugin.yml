@@ -26,3 +26,8 @@ configuration:
           properties:
             metadata-key:
               type: string
+    if-older:
+      type: string
+      enum:
+        - use-rollback
+        - fail
