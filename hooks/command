@@ -3,8 +3,8 @@ set -euo pipefail
 
 convox_rack="$BUILDKITE_PLUGIN_CONVOX_PROMOTE_RACK"
 convox_app="$BUILDKITE_PLUGIN_CONVOX_PROMOTE_APP"
-# TODO: default to verify?
 verify="${BUILDKITE_PLUGIN_CONVOX_PROMOTE_VERIFY:-false}"
+if_older="${BUILDKITE_PLUGIN_CONVOX_PROMOTE_IF_OLDER:-fail}"
 
 if [ "${BUILDKITE_PLUGIN_CONVOX_PROMOTE_RELEASE_METADATA_KEY:-}" != "" ]; then
   convox_release="$(buildkite-agent meta-data get "$BUILDKITE_PLUGIN_CONVOX_PROMOTE_RELEASE_METADATA_KEY")"
@@ -13,13 +13,34 @@ else
 fi
 
 convox_promote_cmd=( convox releases promote --rack="$convox_rack" --app="$convox_app" "$convox_release" )
+convox_rollback_cmd=( convox releases rollback --rack="$convox_rack" --app="$convox_app" "$convox_release" )
 convox_releases_cmd=( convox releases --rack="$convox_rack" --app="$convox_app" )
 
 echo "Release ID: ${convox_release}"
 echo "--- Promoting Convox release"
 
 echo '$'" ${convox_promote_cmd[*]}"
-"${convox_promote_cmd[@]}"
+
+# capture the stderr output to a log file that can be parsed later
+stderr_log="$(mktemp)"
+trap 'rm $stderr_log' EXIT
+if ! "${convox_promote_cmd[@]}" 2> >(tee -a "$stderr_log" >&2); then
+  promote_status="$?"
+
+  if [[ "$if_older" != "use-rollback" ]]; then
+    exit "$promote_status"
+  fi
+
+  # TODO: see if there's an option that isn't reliant on the Rack error response
+  if ! grep -qie 'try rollback' "$stderr_log"; then
+    exit "$promote_status"
+  fi
+
+  echo "--- Rolling back to Convox release"
+
+  echo '$'" ${convox_rollback_cmd[*]}"
+  "${convox_rollback_cmd[@]}"
+fi
 
 if "$verify"; then
   echo "--- Verifying release"

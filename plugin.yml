@@ -17,7 +17,7 @@ configuration:
       type: string
     verify:
       type: boolean
-      default: false # TODO: default to verifying, if it'll work with a deploy key
+      default: false
     release:
       oneOf:
         - type: string
