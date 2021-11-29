@@ -28,7 +28,7 @@ subject() {
   "$PWD/hooks/command"
 }
 
-@test "Runs the promote command with minimal required configuration" {
+@test "Runs the rollback command if the promote failed with the expected error message" {
   stub_commands
 
   subject
